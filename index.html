@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant ID Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    .quiz-container { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .plant-img { width: 100%; border-radius: 10px; }
+    .question { margin-top: 20px; }
+    input[type="text"] { padding: 10px; width: 100%; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    button { padding: 10px 20px; margin-top: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    .result { margin-top: 10px; font-weight: bold; }
+    #score { margin-top: 20px; font-size: 18px; font-weight: bold; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Plant ID Quiz</h1>
+    <div class="question">
+      <img class="plant-img" id="plant-img" src="" alt="Plant Image">
+      <label for="answer">What is the name of this plant?</label>
+      <input type="text" id="answer" placeholder="Type the plant name...">
+      <button onclick="checkAnswer()">Submit</button>
+      <div class="result" id="result"></div>
+    </div>
+    <div id="score"></div>
+  </div>
+
+  <script>
+  const quizData = [
+    { img: "https://www.rhs.org.uk/getmedia/6dc4e556-b5d1-4a61-99cd-25c22f8bd234/Crataegus-monogyna-flowers-RHS.jpg", answer: "hawthorn" },
+    { img: "https://www.rhs.org.uk/getmedia/2a1fa2b4-cfd2-4cc2-a3d9-7a448cfba775/cornus-sanguinea-hero.jpg", answer: "dogwood" },
+    { img: "https://www.rhs.org.uk/getmedia/00714553-bf18-4a00-8e41-c999ec0081d0/ilex-aquifolium-berries-RHS.jpg", answer: "holly" },
+    { img: "https://www.rhs.org.uk/getmedia/3f6cde5f-0b92-459e-9241-1b16bdb5d7b8/hedera-helix-rhs.jpg", answer: "ivy" },
+    { img: "https://www.rhs.org.uk/getmedia/f6b9489d-3db0-4f75-9d61-cfe6c81ff99e/cotoneaster-horizontalis-berries-RHS.jpg", answer: "cotoneaster" },
+    { img: "https://www.rhs.org.uk/getmedia/5a5e8b7d-43e3-4f33-9a4e-85ffb4a90c3c/digitalis-purpurea-flowers.jpg", answer: "foxglove" },
+    { img: "https://www.rhs.org.uk/getmedia/4fcf15c3-3d0c-4e6e-87f7-883a804abf3c/primula-vulgaris-flowers.jpg", answer: "primrose" },
+    { img: "https://www.rhs.org.uk/getmedia/0bc16370-d6a2-44c7-9f79-e0638b1e4732/sorbus-aucuparia-berries.jpg", answer: "rowan" },
+    { img: "https://www.rhs.org.uk/getmedia/9adf0f2d-b62e-4e4f-b69f-ec1b6a0e3495/acer-maple-autumn-colour.jpg", answer: "maple" },
+    { img: "https://www.rhs.org.uk/getmedia/9edb1075-f779-4d61-b26f-f98c60a7e5c8/platanus-hispanica-leaves.jpg", answer: "london plane" },
+    { img: "https://www.rhs.org.uk/getmedia/4943e875-d0c1-4a27-9eec-6ed69c4a46d2/quercus-robur-leaves.jpg", answer: "oak" },
+    { img: "https://www.rhs.org.uk/getmedia/7550e317-ea45-4d50-91f4-8d4bb6b0b30e/betula-pendula-leaves.jpg", answer: "silver birch" },
+    { img: "https://www.rhs.org.uk/getmedia/7aa22b5c-0e83-4a15-8efb-45e5082a7e2b/lonicera-periclymenum-flowers.jpg", answer: "honeysuckle" },
+    { img: "https://www.rhs.org.uk/getmedia/2bc41dc2-cdbb-49c1-85f2-45d93a0c6895/clematis-montana-flowers.jpg", answer: "clematis" },
+    { img: "https://www.rhs.org.uk/getmedia/84d3ed63-4a8c-4dd2-8052-8c46c8c9c172/rosa-rambling-rose.jpg", answer: "rambling rose" },
+    { img: "https://www.rhs.org.uk/getmedia/64b0d5a4-0cf1-4b9c-8a2d-dc7fc89d75a1/digitalis-toadflax.jpg", answer: "toad flax" },
+    { img: "https://www.rhs.org.uk/getmedia/f3e4ac84-f52f-4124-8711-083d925b3e00/hedera-hibernica-leaves.jpg", answer: "ivy" },
+    { img: "https://www.rhs.org.uk/getmedia/061ad6b2-0215-41fd-bbe9-e25a187e2c9b/aucuba-japonica-leaves.jpg", answer: "japanese laurel" },
+    { img: "https://www.rhs.org.uk/getmedia/2175cfd4-9bfa-49f6-9b47-e29783aa0383/hamamelis-x-intermedia-flowers.jpg", answer: "witch hazel" },
+    { img: "https://www.rhs.org.uk/getmedia/14ae96a1-6f26-4e2b-8130-f7a7ca84a035/fatsia-japonica-leaves.jpg", answer: "fatsia japonica" },
+    { img: "https://www.rhs.org.uk/getmedia/72e60994-9b84-4098-99be-289c63a46757/laurel-berries.jpg", answer: "laurel" },
+    { img: "https://www.rhs.org.uk/getmedia/2374630c-6576-4380-bd93-bd4b29e1e5db/choysia-ternata-flowers.jpg", answer: "choysia" },
+    { img: "https://www.rhs.org.uk/getmedia/62c7a567-34ed-4b5d-bf4a-d78f98834a2f/buxus-sempervirens-boxwood-leaves.jpg", answer: "common box" },
+    { img: "https://www.rhs.org.uk/getmedia/42c8d1b0-bc63-4a04-b7ae-cf0412e3012e/ceanothus-thyrsiflorus-flowers.jpg", answer: "ceanothus" },
+    { img: "https://www.rhs.org.uk/getmedia/f65f5f3c-e29e-4328-bd9d-7308c6d2e24f/hydrangea-macrophylla-flowers.jpg", answer: "hydrangea" },
+    { img: "https://www.rhs.org.uk/getmedia/709fb7bc-e5d4-4e1a-a476-7e724d8e15c5/rosa-flowers.jpg", answer: "rose" },
+    { img: "https://www.rhs.org.uk/getmedia/3a0ec4c3-f8ad-49ae-aed5-b2b25e5e4a7b/clematis-flower.jpg", answer: "clematis" },
+    { img: "https://www.rhs.org.uk/getmedia/70b9569b-04b8-423f-9377-1e74f819cc5a/bay-laurel-leaves.jpg", answer: "bay tree" },
+    { img: "https://www.rhs.org.uk/getmedia/1fa28579-21c4-4d7f-b0e6-d41a3ec97cc7/dandelion-flowers.jpg", answer: "dandelion" },
+    { img: "https://www.rhs.org.uk/getmedia/1eaf61f0-e0fc-4380-90f4-6c07d221cf0f/nettles.jpg", answer: "nettles" },
+    { img: "https://www.rhs.org.uk/getmedia/d78b3d49-8eab-4a92-bc33-5770ad7a9870/toadflax-flowers.jpg", answer: "toad flax" },
+    { img: "https://www.rhs.org.uk/getmedia/24a03eaf-f174-46ca-8a22-57db21d0a1ea/chickweed-flowers.jpg", answer: "chickweed" },
+    { img: "https://www.rhs.org.uk/getmedia/d1b38ed4-33e2-4069-99a2-54e36ca65966/ranunculus-flowers.jpg", answer: "ranunculus" },
+    { img: "https://www.rhs.org.uk/getmedia/55e9fda9-b00b-437f-b8bc-d7d17f1ae8a1/creeping-buttercup-flowers.jpg", answer: "creeping buttercup" },
+    { img: "https://www.rhs.org.uk/getmedia/1b9c7d71-564e-41c5-97cc-2f76ffad92a6/bramble-berries.jpg", answer: "brambles" },
+    { img: "https://www.rhs.org.uk/getmedia/6a7b1bb1-22ef-4c45-90a5-7b65c30712c4/cornflower.jpg", answer: "cornflower" },
+    { img: "https://www.rhs.org.uk/getmedia/d3774246-3da7-46a6-b4a4-
+    ];
+
+    const shuffledQuiz = quizData.sort(() => Math.random() - 0.5);
+    let current = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      const q = shuffledQuiz[current];
+      document.getElementById('plant-img').src = q.img;
+      document.getElementById('answer').value = '';
+      document.getElementById('result').textContent = '';
+    }
+
+    function checkAnswer() {
+      const userAnswer = document.getElementById('answer').value.toLowerCase().trim();
+      const resultDiv = document.getElementById('result');
+      const correct = shuffledQuiz[current].answer;
+
+      if (userAnswer.includes(correct)) {
+        resultDiv.textContent = `✅ Correct! This is ${correct}.`;
+        resultDiv.style.color = "green";
+        score++;
+      } else {
+        resultDiv.textContent = `❌ Incorrect. It was ${correct}.`;
+        resultDiv.style.color = "red";
+      }
+
+      current++;
+
+      if (current < shuffledQuiz.length) {
+        setTimeout(loadQuestion, 2000);
+      } else {
+        document.querySelector('.question').style.display = 'none';
+        document.getElementById('score').textContent = `You scored ${score} out of ${shuffledQuiz.length}`;
+      }
+    }
+
+    window.onload = loadQuestion;
+  </script>
+</body>
+</html>
